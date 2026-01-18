@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import jwt from "jsonwebtoken"; 
+import jwt, { JwtPayload } from "jsonwebtoken"; 
 import {JWT_SECRET} from "./config";
 
 
@@ -15,8 +15,7 @@ export default function authMiddleware(req: Request, res: Response, next: NextFu
     const decodedInfo = jwt.verify(token, JWT_SECRET);
 
     if(decodedInfo){
-        //@ts-ignore
-        req.userId = decodedInfo.userId;
+        req.userId = (decodedInfo as JwtPayload).userId;
         next();
     }else{
         res.status(403).json({

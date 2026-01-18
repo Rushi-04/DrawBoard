@@ -1,5 +1,10 @@
 import express from "express";
 import z from "zod";
+import { prisma } from "@repo/db";
+import * as bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import authMiddleware from "./middleware";
+import { JWT_SECRET } from "./config";
 
 const app = express();
 
@@ -11,15 +16,55 @@ app.get('/', (req, res) => {
     });
 });
 
-app.post('/signup', (req, res) => {
-    const {username, password} = req.body;
+app.post('/signup', async (req, res) => {
 
     const requiredBody = z.object({
         username: z.string().min(3).max(20),
-        password: z.string().min(4).max(50),
+        password: z
+        .string()
+        .min(4)
+        .max(50)
+        .regex(/[A-Z]/, {message: "Password must contain at least one uppercase letter"})
+        .regex(/[a-z]/, {message: "Password must contain at least one lowercase letter"})
+        .regex(/[0-9]/, {message: "Password must contain at least one number"}),
         email: z.email()
     })
-    // const parsedBody =
+
+    const parsedBody = requiredBody.safeParse(req.body);
+
+    if(!parsedBody.success)
+    {
+        return res.status(301).json({
+            message: "Invalid format"
+        })
+    }
+
+    const { username, password, email } = req.body;
+    const hashedPassword = await bcrypt.hash(password, 6) 
+    
+    // save to db
+/* 
+    try{
+        const user = await prisma.user.create({
+            data: {
+                username: username,
+                password: hashedPassword,
+                email: email,
+            }
+        })
+
+        return res.status(200).json({
+            mgs: "user created successfully,
+            user: user
+        "})
+    }catch(e){
+        return res.status(501).json({
+            mgs: "Error Occured",
+            error: (Error as e)
+        })
+    }
+
+*/
 
 
     return res.json({
@@ -27,11 +72,37 @@ app.post('/signup', (req, res) => {
     });
 });
 
-app.post('/signin', (req, res) => {
+
+app.post('/signin', async(req, res) => {
+
+    const {username, password} = req.body;
+
+
+    const user = await prisma.user.findOne({
+        data: {
+            username: username
+        }})    
+
+    if(!user) return 
+
+    const passwordMatched = await bcrypt.compare(password, user.password);
+
+    if(!passwordMatched) return 
+
+    const token = jwt.sign({ userId: user.id}, JWT_SECRET); 
+
+    return res.status(200).json({
+        msg: "User signedIn",
+        token: token
+    })
+});
+
+app.get('/room', authMiddleware, (req, res) => {
+
 
 
     return res.json({
-        msg: "Hello from http backend,"
+        roomId: 123
     });
 });
 

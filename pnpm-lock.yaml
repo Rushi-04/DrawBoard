@@ -39,6 +39,12 @@ importers:
         specifier: ^4.3.5
         version: 4.3.5
     devDependencies:
+      '@repo/backend-common':
+        specifier: workspace:*
+        version: link:../../packages/backend-common
+      '@repo/common':
+        specifier: workspace:*
+        version: link:../../packages/common
       '@repo/db':
         specifier: workspace:*
         version: link:../../packages/database
@@ -110,6 +116,12 @@ importers:
         specifier: ^4.3.5
         version: 4.3.5
     devDependencies:
+      '@repo/backend-common':
+        specifier: workspace:*
+        version: link:../../packages/backend-common
+      '@repo/common':
+        specifier: workspace:*
+        version: link:../../packages/common
       '@repo/typescript-config':
         specifier: workspace:*
         version: link:../../packages/typescript-config
@@ -119,6 +131,26 @@ importers:
       '@types/ws':
         specifier: ^8.18.1
         version: 8.18.1
+
+  packages/backend-common:
+    dependencies:
+      dotenv:
+        specifier: ^17.2.3
+        version: 17.2.3
+    devDependencies:
+      '@repo/typescript-config':
+        specifier: workspace:*
+        version: link:../typescript-config
+
+  packages/common:
+    dependencies:
+      zod:
+        specifier: ^4.3.5
+        version: 4.3.5
+    devDependencies:
+      '@repo/typescript-config':
+        specifier: workspace:*
+        version: link:../typescript-config
 
   packages/database:
     dependencies:

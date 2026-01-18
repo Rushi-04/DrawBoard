@@ -23,6 +23,8 @@
   "devDependencies": {
     "@repo/db": "workspace:*",
     "@repo/typescript-config": "workspace:*",
+    "@repo/backend-common": "workspace:*",
+    "@repo/common": "workspace:*",
     "@types/express": "^5.0.6",
     "@types/jsonwebtoken": "^9.0.10",
     "turbo": "^2.7.5"

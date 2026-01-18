@@ -4,7 +4,9 @@ import { prisma } from "@repo/db";
 import * as bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import authMiddleware from "./middleware";
-import { JWT_SECRET } from "./config";
+import { JWT_SECRET } from "@repo/backend-common/config";
+import {CreateUserSchema, SignInSchema, CreateRoomSchema} from "@repo/common/types"
+
 
 const app = express();
 
@@ -18,19 +20,10 @@ app.get('/', (req, res) => {
 
 app.post('/signup', async (req, res) => {
 
-    const requiredBody = z.object({
-        username: z.string().min(3).max(20),
-        password: z
-        .string()
-        .min(4)
-        .max(50)
-        .regex(/[A-Z]/, {message: "Password must contain at least one uppercase letter"})
-        .regex(/[a-z]/, {message: "Password must contain at least one lowercase letter"})
-        .regex(/[0-9]/, {message: "Password must contain at least one number"}),
-        email: z.email()
-    })
-
-    const parsedBody = requiredBody.safeParse(req.body);
+    // const requiredBody = CreateUserSchema;
+    // const parsedBody = requiredBody.safeParse(req.body);
+    
+    const parsedBody = CreateUserSchema.safeParse(req.body);
 
     if(!parsedBody.success)
     {
@@ -75,6 +68,14 @@ app.post('/signup', async (req, res) => {
 
 app.post('/signin', async(req, res) => {
 
+    const data = SignInSchema.safeParse(req.body);
+
+    if(!data.success) {
+        return res.status(301).json({
+            msg: "Invalid format"
+        })
+    }
+
     const {username, password} = req.body;
 
 
@@ -99,7 +100,13 @@ app.post('/signin', async(req, res) => {
 
 app.get('/room', authMiddleware, (req, res) => {
 
+    const data = CreateRoomSchema.safeParse(req.body);
 
+    if(!data.success) {
+        return res.status(301).json({
+            msg: "Invalid format"
+        })
+    }
 
     return res.json({
         roomId: 123

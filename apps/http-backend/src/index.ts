@@ -1,5 +1,4 @@
 import express from "express";
-import z from "zod";
 import { prisma } from "@repo/db";
 import * as bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
@@ -26,7 +25,7 @@ app.post('/signup', async (req, res) => {
     const parsedBody = CreateUserSchema.safeParse(req.body);
 
     if(!parsedBody.success)
-    {
+    {   
         return res.status(301).json({
             message: "Invalid format"
         })

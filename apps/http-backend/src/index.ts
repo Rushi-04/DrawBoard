@@ -34,8 +34,8 @@ app.post('/signup', async (req, res) => {
     const { username, password, email } = req.body;
     const hashedPassword = await bcrypt.hash(password, 6) 
     
-    // save to db
-/* 
+
+    // save to db  
     try{
         const user = await prisma.user.create({
             data: {
@@ -45,23 +45,19 @@ app.post('/signup', async (req, res) => {
             }
         })
 
+        if(!user) return
+
         return res.status(200).json({
-            mgs: "user created successfully,
+            mgs: "user created successfully",
             user: user
-        "})
+        })
     }catch(e){
         return res.status(501).json({
             mgs: "Error Occured",
-            error: (Error as e)
+            error: e
         })
     }
 
-*/
-
-
-    return res.json({
-        msg: "Hello from http backend,"
-    });
 });
 
 

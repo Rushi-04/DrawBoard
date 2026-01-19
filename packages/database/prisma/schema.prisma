@@ -13,3 +13,37 @@ datasource db {
   provider = "postgresql"
 }
 
+
+model User {
+  id           Int       @id @default(autoincrement())
+  username     String    @unique
+  email        String    @unique 
+  password     String
+  photo        String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  rooms        Room[]
+  message      Message[]
+}
+// user -> room  => one to many relationship
+// user -> messages  => one to many relationship
+
+model Room {
+  id           Int        @id @default(autoincrement())
+  slug         String     @unique                        
+  description  String? 
+  createdAt    DateTime   @default(now())
+  adminId       Int
+  admin         User      @relation(fields: [adminId], references: [id])
+  message      Message[]
+}
+
+model Message {
+  id           Int       @id @default(autoincrement())
+  content      String
+  createdAt    DateTime  @default(now())
+  userId       Int
+  roomId       Int
+  user         User      @relation(fields: [userId], references: [id])
+  room         Room      @relation(fields: [roomId], references: [id])
+}

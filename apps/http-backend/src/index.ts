@@ -39,27 +39,24 @@ app.post('/signup', async (req, res) => {
     try{
         const user = await prisma.user.create({
             data: {
-                username: username,
+                username,
                 password: hashedPassword,
-                email: email,
+                email
             }
-        })
-
-        if(!user) return
+        });
 
         return res.status(200).json({
-            mgs: "user created successfully",
+            mgs: "User created successfully",
             user: user
-        })
+        });
     }catch(e){
-        return res.status(501).json({
-            mgs: "Error Occured",
+        return res.status(409).json({
+            mgs: "Already Exists",
             error: e
         })
     }
 
 });
-
 
 app.post('/signin', async(req, res) => {
 
@@ -74,8 +71,8 @@ app.post('/signin', async(req, res) => {
     const {username, password} = req.body;
 
 
-    const user = await prisma.user.findOne({
-        data: {
+    const user = await prisma.user.findFirst({
+        where: {
             username: username
         }})    
 

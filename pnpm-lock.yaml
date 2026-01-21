@@ -144,6 +144,9 @@ importers:
       '@repo/typescript-config':
         specifier: workspace:*
         version: link:../typescript-config
+      typescript:
+        specifier: ^5.3.3
+        version: 5.9.2
 
   packages/common:
     dependencies:
@@ -154,6 +157,9 @@ importers:
       '@repo/typescript-config':
         specifier: workspace:*
         version: link:../typescript-config
+      typescript:
+        specifier: ^5.3.3
+        version: 5.9.2
 
   packages/database:
     dependencies:
@@ -170,12 +176,18 @@ importers:
         specifier: ^8.17.1
         version: 8.17.1
     devDependencies:
+      '@repo/typescript-config':
+        specifier: workspace:*
+        version: link:../typescript-config
       '@types/pg':
         specifier: ^8.16.0
         version: 8.16.0
       prisma:
         specifier: ^7.2.0
         version: 7.2.0(@types/react@19.2.2)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(typescript@5.9.2)
+      typescript:
+        specifier: ^5.3.3
+        version: 5.9.2
 
   packages/eslint-config:
     devDependencies:

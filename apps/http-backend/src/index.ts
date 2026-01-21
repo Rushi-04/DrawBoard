@@ -76,7 +76,12 @@ app.post('/signin', async(req, res) => {
             username: username
         }})    
 
-    if(!user) return 
+    if(!user) {
+        res.status(403).json({
+            msg: "Not Authorized",
+        });
+        return;
+    }
 
     const passwordMatched = await bcrypt.compare(password, user.password);
 
@@ -90,25 +95,38 @@ app.post('/signin', async(req, res) => {
     })
 });
 
-app.get('/room', authMiddleware, (req, res) => {
+app.post('/room', authMiddleware, async(req, res) => {
 
-    const data = CreateRoomSchema.safeParse(req.body);
+    const parsedData = CreateRoomSchema.safeParse(req.body);
 
-    if(!data.success) {
+    if(!parsedData.success) {
         return res.status(301).json({
             msg: "Invalid format"
         })
-    }
+    } 
 
-    return res.json({
-        roomId: 123
-    });
+    const userId = req.userId;
+
+    try{
+        const room = await prisma.room.create({
+            data: {
+                slug: parsedData.data.room,
+                adminId: Number(userId)
+            }
+        })
+        return res.status(200).json({
+            msg: "Room created successfully",
+            roomId: room.id
+        });
+    }catch(e){
+        return res.status(403).json({
+            msg: "Room not created, already exists with this name.",
+            error: e
+        })
+    }
 });
 
 
-
-
-
 app.listen(3001, () => {
-    console.log("Running on port 3002...");
+    console.log("Running on port 3001...");
 });

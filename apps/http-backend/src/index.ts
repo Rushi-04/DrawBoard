@@ -44,15 +44,15 @@ app.post('/signup', async (req, res) => {
                 email
             }
         });
-
+ 
         return res.status(200).json({
             mgs: "User created successfully",
             user: user
         });
-    }catch(e){
-        return res.status(409).json({
-            mgs: "Already Exists",
-            error: e
+    }catch(e){ 
+        return res.status(409).json({ 
+            mgs: "Already Exists", 
+            error: e 
         })
     }
 

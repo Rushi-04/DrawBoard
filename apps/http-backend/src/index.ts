@@ -2,9 +2,9 @@ import express from "express";
 import { prisma } from "@repo/db";
 import * as bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import authMiddleware from "./middleware";
+import authMiddleware from "./middleware";     
 import { JWT_SECRET } from "@repo/backend-common/config";
-import {CreateUserSchema, SignInSchema, CreateRoomSchema} from "@repo/common/types"
+import {CreateUserSchema, SignInSchema, CreateRoomSchema} from "@repo/common/types";
 
 
 const app = express();
@@ -27,12 +27,13 @@ app.post('/signup', async (req, res) => {
     if(!parsedBody.success)
     {   
         return res.status(301).json({
-            message: "Invalid format"
+            message: "Invalid format",
+            error: parsedBody.error.message
         })
     }
 
     const { username, password, email } = req.body;
-    const hashedPassword = await bcrypt.hash(password, 6) 
+    const hashedPassword = await bcrypt.hash(password, 6); 
     
 
     // save to db  
@@ -44,15 +45,15 @@ app.post('/signup', async (req, res) => {
                 email
             }
         });
-
+ 
         return res.status(200).json({
-            mgs: "User created successfully",
-            user: user
+            mgs: "User created successfully", 
+            user: user.id
         });
-    }catch(e){
-        return res.status(409).json({
-            mgs: "Already Exists",
-            error: e
+    }catch(e){ 
+        return res.status(409).json({ 
+            mgs: "Already Exists", 
+            error: e 
         })
     }
 

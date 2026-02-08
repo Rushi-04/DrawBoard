@@ -65,65 +65,90 @@ wss.on("connection", (socket, request) => {
 {
     type: "join_room",
     payload: {
-        room: "1221"
+        roomId: "1221"
     }
 }
 
 {
     type: "leave_room",
     payload: {
-        room: "1221"
+        roomId: "1221"
     }
 }
 
 {
     type: "chat",
     payload: {
-        message: "Hi there"
+        message: "Hi there",
+        roomId: "21213"
     }
 }
 
----
-{
-    type: "join_room",
-    payload: {
-        room: "1221"
-    }
-}
----
 */
+
+    // message handler
     socket.on("message", async (message) => {
         const data = JSON.parse(message as unknown as string);
         
         if(!data) return 
 
+        // Handle join room event
         if(data.type == "join_room"){
-            
+            const currentUser = users.find(user => user.ws === socket);
+            currentUser?.rooms.push(data.payload.roomId);
         }
 
-        if(data.type == "chat"){
-            const currentUserRoom = allRooms.find((room) => room.socket == socket)?.roomId;
+        // Handle leave room event
+        if(data.type == "leave_room"){
+            const currentUser = users.find(user => user.ws === socket);
 
-            allRooms.forEach(async (room) => {
-                if(room.roomId == currentUserRoom){
-                    room.socket.send(data.payload.message);
-                    await prisma.message.create({
+            if(!currentUser) return;
+
+            currentUser.rooms = currentUser?.rooms.filter(room => room !== data.payload.roomId);
+        }
+
+        // Handle chat event
+        if(data.type == "chat"){
+            // const currentUser = users.find(user => user.ws == socket);
+            const roomId = data.payload.roomId;
+            const msg = data.payload.message;
+
+            await prisma.message.create({
                         data: {
-                            content: data.payload.message,
+                            content: msg,
                             userId: userId,
-                            roomId: room.roomId 
+                            roomId: roomId
                         }
                     })
+
+            users.forEach((user) => {
+                if(user.rooms.includes(roomId)){
+                    user.ws.send(JSON.stringify({
+                        type: "chat",
+                        payload: {
+                            message: msg,
+                            roomId
+                        }
+                    }));
+                    // await prisma.message.create({
+                    //     data: {
+                    //         content: msg,
+                    //         userId: userId,
+                    //         roomId: roomId
+                    //     }
+                    // })
                 }
             })
         }
+    
+    // Error Handler
     socket.on("error", () => {
-        console.error("Error Ocurred.")
+        console.error("Error Ocurred.");
     });
 
-    socket.on("close", () => {
-        allRooms = allRooms.filter((room) => room.socket != socket);
-    });
+    // socket.on("close", () => {
+    //     users = allRooms.filter((room) => room.socket != socket);
+    // });
 
     })
 })

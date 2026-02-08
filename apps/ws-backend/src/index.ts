@@ -6,12 +6,37 @@ import { prisma } from "@repo/db";
 
 const wss = new WebSocketServer({port: 8080});
 
-interface Room {
-    roomId: number,
-    socket: WebSocket
+// interface Room {
+//     roomId: number,
+//     socket: WebSocket
+// }
+
+interface User {
+    userId: string,
+    rooms: string[],
+    ws: WebSocket
 }
 
-let allRooms: Room[] = [];
+const users: User[] = [];
+
+const checkUser = (token: string) => {
+    try{
+        const decoded = jwt.verify(token, JWT_SECRET)
+
+        if(typeof decoded == "string"){
+            return null;
+        }
+
+        if(!decoded || !decoded.userId){
+            return null;
+        }
+
+        return decoded.userId;
+    }catch(e){
+        return null;
+    }
+    return null;
+}
 
 wss.on("connection", (socket, request) => {
     const url = request.url; // -->  ws://localhost:3000?token=adegwiqewjfwbqhdwjq
@@ -21,23 +46,31 @@ wss.on("connection", (socket, request) => {
     const queryParams = new URLSearchParams(url?.split("?")[1])
     const token = queryParams.get("token") || "";
 
-    const decoded = jwt.verify(token, JWT_SECRET)
+    const userId = checkUser(token);
 
-    if(typeof decoded == "string"){
+    if(userId == null){
         socket.close();
-        return ;
+        return null;
     }
+    
+    users.push({
+        userId: userId,
+        rooms: [],
+        ws: socket
+    })
 
-    if(!decoded || !decoded.userId){
-        socket.close();
-        return ;
-    }
-
-    // -----------------
+    // ----------------- 3
 
 /*
 {
-    type: "join",
+    type: "join_room",
+    payload: {
+        room: "1221"
+    }
+}
+
+{
+    type: "leave_room",
     payload: {
         room: "1221"
     }
@@ -50,19 +83,22 @@ wss.on("connection", (socket, request) => {
     }
 }
 
+---
+{
+    type: "join_room",
+    payload: {
+        room: "1221"
+    }
+}
+---
 */
-
-
     socket.on("message", async (message) => {
         const data = JSON.parse(message as unknown as string);
         
         if(!data) return 
 
-        if(data.type == "join"){
-            allRooms.push({
-                roomId: data.payload.room,
-                socket: socket
-            });
+        if(data.type == "join_room"){
+            
         }
 
         if(data.type == "chat"){
@@ -74,7 +110,7 @@ wss.on("connection", (socket, request) => {
                     await prisma.message.create({
                         data: {
                             content: data.payload.message,
-                            userId: decoded.userId,
+                            userId: userId,
                             roomId: room.roomId 
                         }
                     })

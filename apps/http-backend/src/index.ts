@@ -19,7 +19,7 @@ app.get('/', (req, res) => {
 
 app.post('/signup', async (req, res) => {
 
-    // const requiredBody = CreateUserSchema;
+    // const requiredBody = CreateUserSchema;  
     // const parsedBody = requiredBody.safeParse(req.body);
     
     const parsedBody = CreateUserSchema.safeParse(req.body);

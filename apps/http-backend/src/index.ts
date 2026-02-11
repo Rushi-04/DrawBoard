@@ -145,6 +145,36 @@ app.get('/chats/:roomId', async (req, res) => {
     })
 })
 
+// new endpoint -- purpose --> given you a slug give me the room details (id)
+
+app.get('/room/:slug', async (req, res) => {
+    const slug = req.params.slug;
+
+    try{
+        const room = await prisma.room.findFirst({
+            where: {
+                slug
+            }
+        }) 
+
+        if(!room){
+            return res.status(404).json({
+                message: "Room not found."
+            })
+        }
+
+        return res.status(200).json({
+            message: "Room found!",
+            roomId: room.id
+        })
+    } catch (error) {
+        return res.status(403).json({
+            error: error
+        })
+    }
+
+})
+
 app.listen(3001, () => {
     console.log("Running on port 3001...");
 });

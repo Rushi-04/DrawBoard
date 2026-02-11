@@ -59,7 +59,7 @@ wss.on("connection", (socket, request) => {
         ws: socket
     })
 
-    // ----------------- 3
+// ----- payload format -----
 
 /*
 {

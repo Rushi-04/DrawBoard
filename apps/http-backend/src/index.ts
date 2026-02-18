@@ -2,7 +2,7 @@ import express from "express";
 import { prisma } from "@repo/db";
 import * as bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import authMiddleware from "./middleware";     
+import authMiddleware from "./middleware";    
 import { JWT_SECRET } from "@repo/backend-common/config";
 import {CreateUserSchema, SignInSchema, CreateRoomSchema} from "@repo/common/types";
 
@@ -13,7 +13,7 @@ app.use(express.json());
 
 app.get('/', (req, res) => {
     return res.json({
-        msg: "Hello from http backend,"
+        msg: "Hello from http backend."
     });
 });
 
